@@ -34,8 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     private JSONArray movieDataJsonArray;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,13 +67,13 @@ public class MainActivity extends AppCompatActivity {
         spinnerOrderBy.setAdapter(spinnerAdapter);
         gridViewThumnails.setAdapter(imageAdapter = new ImageAdapter(this));
 
-            Spinner spinner = (Spinner) findViewById(R.id.spinnerOrderBy);
-            String spinnerValue = null;
-            if(spinner.getSelectedItem().toString() == "Order By Rating"){
-                spinnerValue = "rating";
-            }else {
-                spinnerValue = "popularity";
-            }
+        Spinner spinner = (Spinner) findViewById(R.id.spinnerOrderBy);
+        String spinnerValue = null;
+        if(spinner.getSelectedItem().toString() == "Order By Rating"){
+            spinnerValue = "rating";
+        }else {
+            spinnerValue = "popularity";
+        }
 
         spinnerOrderBy.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -121,17 +119,14 @@ public class MainActivity extends AppCompatActivity {
         fetchMoviesTask.execute(orderBy);
     }
 
-
-
     public class FetchMoviesTask extends AsyncTask<String, Void, String>{
         private JSONArray movieArray;
             @Override
-        protected String doInBackground(String... params) {
+            protected String doInBackground(String... params) {
 
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String movieJsonStr = null;
-
 
             try{
                 URL url = new URL("http://api.themoviedb.org/3/discover/movie?sort_by=" +params[0]+

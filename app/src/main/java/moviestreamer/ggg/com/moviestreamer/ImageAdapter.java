@@ -58,7 +58,6 @@ public class ImageAdapter extends BaseAdapter {
                 .placeholder(R.drawable.ic_hourglass128)
                 .error(R.drawable.ic_404)
                 .into(imageView);
-       // Log.w("Picasso called", "Let's see if it was called");
         return imageView;
     }
 
