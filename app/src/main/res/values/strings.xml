@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MovieStreamer</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_movie_details">MovieDetails</string>
+    <string name="picasso_api_key">ENTER YOUR PICASSO API KEY HERE</string>
+</resources>
