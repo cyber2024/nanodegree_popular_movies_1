@@ -1,6 +1,9 @@
 package moviestreamer.ggg.com.moviestreamer;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,15 +35,32 @@ public class MainActivity extends AppCompatActivity {
     public ArrayAdapter<String> spinnerAdapter;
     private String spinnerOrderByArray[];
     public ImageAdapter imageAdapter;
-
     private JSONArray movieDataJsonArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         spinnerOrderByArray = new String[]{ "Order By Popularity", "Order By Rating"};
         spinnerOrderBy = (Spinner) findViewById(R.id.spinnerOrderBy);
+        spinnerAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, spinnerOrderByArray);
+        spinnerOrderBy.setAdapter(spinnerAdapter);
+        spinnerOrderBy.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Spinner spinner = (Spinner) findViewById(R.id.spinnerOrderBy);
+                if (spinner.getSelectedItem().toString() == "Order By Rating") {
+                    getMovieData("vote_average");
+                } else {
+                    getMovieData("popularity");
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
         gridViewThumnails = (GridView) findViewById(R.id.gridViewThumbnails);
         gridViewThumnails.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -62,34 +83,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-        spinnerAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, spinnerOrderByArray);
-        spinnerOrderBy.setAdapter(spinnerAdapter);
         gridViewThumnails.setAdapter(imageAdapter = new ImageAdapter(this));
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinnerOrderBy);
-        String spinnerValue = null;
-        if(spinner.getSelectedItem().toString() == "Order By Rating"){
-            spinnerValue = "rating";
-        }else {
-            spinnerValue = "popularity";
-        }
-
-        spinnerOrderBy.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Spinner spinner = (Spinner) findViewById(R.id.spinnerOrderBy);
-                if (spinner.getSelectedItem().toString() == "Order By Rating") {
-                    getMovieData("vote_average");
-                } else {
-                    getMovieData("popularity");
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
     }
 
     @Override
@@ -114,10 +109,29 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void getMovieData(String orderBy){
+    public boolean getMovieData(String orderBy){
+        if(!isNetworkAvailable()) {
+            Toast.makeText(this, R.string.no_internet_connection, Toast.LENGTH_LONG).show();
+            return false; //bail if there is no network
+        }
         FetchMoviesTask fetchMoviesTask = new FetchMoviesTask();
         fetchMoviesTask.execute(orderBy);
+        return true;
     }
+    private boolean isNetworkAvailable(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService
+                (Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
+
+    /***
+     *
+     * Fetch Movies Via Async Task
+     *
+     */
 
     public class FetchMoviesTask extends AsyncTask<String, Void, String>{
         private JSONArray movieArray;
@@ -130,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
             try{
                 URL url = new URL("http://api.themoviedb.org/3/discover/movie?sort_by=" +params[0]+
-                        ".desc&api_key="+getString(R.string.picasso_api_key));
+                        ".desc&api_key="+getString(R.string.picasso_api_key)+"&language=en");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
@@ -168,11 +182,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-                try {
-                    getMovieDataFromJson(movieJsonStr);
-                } catch (JSONException e){
-                    e.printStackTrace();
-                }
+
+            try {
+                getMovieDataFromJson(movieJsonStr);
+            } catch (JSONException e){
+                e.printStackTrace();
+            }
             return movieJsonStr;
         }
         public void getMovieDataFromJson(String jsonString) throws JSONException {

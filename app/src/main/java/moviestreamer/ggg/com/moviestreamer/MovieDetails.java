@@ -21,6 +21,7 @@ public class MovieDetails extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
 
+
         year = (TextView)findViewById(R.id.year);
         title = (TextView)findViewById(R.id.title);
         synopsis = (TextView)findViewById(R.id.synopsis);
@@ -50,8 +51,12 @@ public class MovieDetails extends AppCompatActivity {
                     rating.setText(movie.getString("vote_average") + "/10");
                 }
 
-            backdropPath = "http://image.tmdb.org/t/p/w300" + movie.getString("backdrop_path");
-            posterURL = "http://image.tmdb.org/t/p/w185" + movie.getString("poster_path");
+            backdropPath = "http://image.tmdb.org/t/p/w300" +
+                    (movie.getString("backdrop_path")==null ? "null" :
+                            movie.getString("backdrop_path"));
+            posterURL = "http://image.tmdb.org/t/p/w300" +
+                    (movie.getString("poster_path")==null ? "null" :
+                            movie.getString("poster_path"));
             poster = (ImageView) findViewById(R.id.poster);
             Picasso.with(poster.getContext())
                     .load(posterURL)
@@ -61,5 +66,7 @@ public class MovieDetails extends AppCompatActivity {
         } catch (JSONException e){
             e.printStackTrace();
         }
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 }

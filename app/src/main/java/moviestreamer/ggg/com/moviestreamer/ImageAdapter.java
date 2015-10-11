@@ -18,6 +18,7 @@ import org.json.JSONObject;
  * Created by relfenbein on 4/10/2015.
  */
 public class ImageAdapter extends BaseAdapter {
+    private static final String LOG_TAG = ImageAdapter.class.getSimpleName();
 
     private Context mContext;
     private String[] posterPathArray = new String[1];
@@ -61,14 +62,22 @@ public class ImageAdapter extends BaseAdapter {
         return imageView;
     }
 
-    public void updateURLs(JSONArray movieArray){
+    public boolean updateURLs(JSONArray movieArray){
+        if(movieArray == null) {
+            //bail early
+            Log.e(LOG_TAG, "Error JSONArray movieArray is null: - "+movieArray.toString());
+            return false;
+        }
         String[] tempPosterPaths = new String[movieArray.length()];
+
+
 
         for(int i = 0; i <movieArray.length(); i++){
             try {
                 JSONObject tempObj = movieArray.getJSONObject(i);
                 tempPosterPaths[i] = "http://image.tmdb.org/t/p/w185" +
-                        tempObj.getString("poster_path");
+                        (tempObj.getString("poster_path")==null ? "null" :
+                                tempObj.getString("poster_path"));
             } catch (JSONException e){
                 Log.e("JSON EXCEPTION ERROR",e.getMessage());
                 e.printStackTrace();
@@ -76,5 +85,6 @@ public class ImageAdapter extends BaseAdapter {
         }
         this.posterPathArray = tempPosterPaths;
         this.notifyDataSetChanged();
+        return true;
     }
 }

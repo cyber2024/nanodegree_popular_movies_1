@@ -3,6 +3,9 @@
     package="moviestreamer.ggg.com.moviestreamer" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+
 
     <application
         android:allowBackup="true"
@@ -22,7 +25,7 @@
             android:name=".MovieDetails"
             android:label="@string/title_activity_movie_details"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="moviestreamer.ggg.com.moviestreamer.MainActivity" />
